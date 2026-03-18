@@ -1,5 +1,5 @@
 [project]
-name = "laboratorio"
+name = "MDS7202"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [tool.ruff]
-target-version = "py314" $ python 3.14 for compatibility
+target-version = "py312"
 line-length = 120
 
 [tool.ruff.lint]
