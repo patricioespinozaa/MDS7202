@@ -9,6 +9,9 @@ __pycache__/
 # imagenes lab 2
 imagenes_lab/
 
+#carpeta mlruns de carpeta lab_8
+mlruns/
+
 # Distribution / packaging
 .Python
 build/
