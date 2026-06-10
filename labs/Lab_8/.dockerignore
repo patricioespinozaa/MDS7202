@@ -1,0 +1,23 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.env
+.venv/
+venv/
+
+# MLflow runs
+mlruns/
+
+# Datos crudos
+water_potability.csv
+
+# Notebook y scripts de entrenamiento
+*.ipynb
+optimize.py
+
+# Git
+.git/
+.gitignore
