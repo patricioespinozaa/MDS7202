@@ -6,8 +6,13 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "category-encoders>=2.9.0",
+    "faiss-cpu>=1.14.3",
     "fastapi>=0.136.3",
     "jupyterlab>=4.5.6",
+    "langchain-community>=0.4.2",
+    "langchain-core>=1.4.8",
+    "langchain-google-genai>=4.2.5",
+    "langchain-text-splitters>=1.1.2",
     "lightgbm>=4.6.0",
     "matplotlib>=3.10.8",
     "missingno>=0.5.2",
@@ -21,6 +26,7 @@ dependencies = [
     "plotly>=6.6.0",
     "pre-commit>=4.5.1",
     "protobuf==3.20.3",
+    "pypdf2>=3.0.1",
     "ruff>=0.15.6",
     "scikit-learn>=1.8.0",
     "setuptools<82.0.0",
