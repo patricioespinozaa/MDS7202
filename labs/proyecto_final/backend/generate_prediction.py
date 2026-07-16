@@ -95,11 +95,19 @@ def generate_prediction(
         contenido_ticket: Descripción del ticket.
         canal_ticket: Canal por el que llegó (p.ej. "Whatsapp", "Correo", "Página Web").
         categoria_problema: Categoría del problema (p.ej. "Cuenta", "Fraude", "Técnica", ...).
+        usuario_tipo_cuenta: Tipo de cuenta del usuario (p.ej. "Free", "Premium", "Business").
+        usuario_antiguedad_dias: Antigüedad de la cuenta del usuario, en días.
 
     Returns:
         El Nivel_Prioridad predicho: "Baja", "Media", "Alta" o "Critica".
+
+    Nota: usuario_tipo_cuenta y usuario_antiguedad_dias se incluyen en el input por
+    completitud del esquema (son atributos del usuario disponibles en los datos
+    originales), pero el pipeline actualmente cargado (MLP + Embeddings) no las
+    utiliza para predecir: su ColumnTransformer solo consume las columnas de
+    embeddings, así que estas dos quedan presentes en el DataFrame pero se ignoran.
     """
-    # Vectorización siguiendo elmismo formato usado para generar los embeddings de entrenamiento.
+    # Vectorización siguiendo el mismo formato usado para generar los embeddings de entrenamiento.
     texto_embedding = f"Asunto_Ticket: {asunto_ticket}\nContenido_Ticket: {contenido_ticket}\n"
     vector = _embeddings_client.embed_query(texto_embedding)
 
