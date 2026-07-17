@@ -1,13 +1,14 @@
+"""App de Gradio para priorizar tickets de soporte de ChaucherApp."""
+
 import gradio as gr
 from services import enviar_prediccion
 
-# Paleta de colores
+# Paleta acorde a la estética de ChaucherApp: celeste + morado claro.
 CELESTE = "#3AB6E8"
 MORADO_CLARO = "#B39DDB"
 
 CANALES = ["Whatsapp", "Correo", "Página Web"]
 CATEGORIAS_PROBLEMA = ["Cuenta", "Fraude", "Técnica", "Cobros", "Pregunta general", "Otro"]
-TIPOS_CUENTA = ["Free", "Premium", "Business"]
 
 COLOR_POR_PRIORIDAD = {
     "Baja": "#4CAF50",
@@ -23,36 +24,36 @@ CSS = f"""
 #titulo {{
     text-align: center;
     background: linear-gradient(90deg, {CELESTE} 0%, {MORADO_CLARO} 100%);
-    padding: 18px;
+    padding: 20px;
     border-radius: 12px;
     color: white;
+}}
+#titulo h1 {{
+    margin: 0;
+    font-size: 1.6em;
+}}
+#titulo p {{
+    margin: 4px 0 0 0;
+    font-size: 1em;
+    opacity: 0.9;
 }}
 """
 
 tema = gr.themes.Soft(primary_hue="purple", secondary_hue="sky")
 
 
-def _predecir(
-    asunto_ticket,
-    contenido_ticket,
-    canal_ticket,
-    categoria_problema,
-    usuario_tipo_cuenta,
-    usuario_antiguedad_dias,
-):
+def _predecir(asunto_ticket, contenido_ticket, canal_ticket, categoria_problema):
     if not asunto_ticket.strip() or not contenido_ticket.strip():
-        return "⚠️ Debes completar el asunto y el contenido del ticket."
+        return "Debe completar el asunto y el contenido del ticket."
 
     resultado = enviar_prediccion(
         asunto_ticket=asunto_ticket,
         contenido_ticket=contenido_ticket,
         canal_ticket=canal_ticket,
         categoria_problema=categoria_problema,
-        usuario_tipo_cuenta=usuario_tipo_cuenta,
-        usuario_antiguedad_dias=int(usuario_antiguedad_dias),
     )
 
-    if resultado.startswith("⚠️"):
+    if resultado.startswith("Error") or resultado.startswith("No se pudo"):
         return resultado
 
     color = COLOR_POR_PRIORIDAD.get(resultado, "#607D8B")
@@ -65,48 +66,41 @@ def _predecir(
     )
 
 
-with gr.Blocks(title="ChaucherApp - Priorización de Tickets") as demo:
-    gr.HTML('<h1 id="titulo">🎫 ChaucherApp — Priorización de Tickets de Soporte</h1>')
-    gr.Markdown("Completa los datos del ticket y del usuario para predecir su nivel de prioridad.")
+with gr.Blocks(title="ChaucherApp. Priorización de Tickets") as demo:
+    gr.HTML(
+        '<div id="titulo">'
+        "<h1>ChaucherApp</h1>"
+        "<p>Sistema de priorización de tickets de soporte al cliente</p>"
+        "</div>"
+    )
+    gr.Markdown("Complete los datos del ticket para obtener el nivel de prioridad estimado.")
 
     with gr.Group():
-        gr.Markdown("### 🎫 Atributos del Ticket")
-        asunto_ticket = gr.Textbox(label="Asunto del ticket", placeholder="Ej: Transferencia fallida")
+        gr.Markdown("### Descripción del ticket")
+        asunto_ticket = gr.Textbox(label="Asunto del ticket", placeholder="Ejemplo: Transferencia fallida")
         contenido_ticket = gr.Textbox(
             label="Contenido del ticket",
-            placeholder="Describe el problema con el mayor detalle posible...",
+            placeholder="Describa el problema con el mayor detalle posible.",
             lines=5,
         )
+
+    with gr.Group():
+        gr.Markdown("### Clasificación del ticket")
         with gr.Row():
             canal_ticket = gr.Dropdown(choices=CANALES, value=CANALES[0], label="Canal de ingreso")
             categoria_problema = gr.Dropdown(
                 choices=CATEGORIAS_PROBLEMA, value=CATEGORIAS_PROBLEMA[0], label="Categoría del problema"
             )
 
-    with gr.Group():
-        gr.Markdown("### 👤 Atributos del Usuario")
-        with gr.Row():
-            usuario_tipo_cuenta = gr.Dropdown(choices=TIPOS_CUENTA, value=TIPOS_CUENTA[0], label="Tipo de cuenta")
-            usuario_antiguedad_dias = gr.Number(
-                label="Antigüedad de la cuenta (días)", value=30, minimum=0, precision=0
-            )
-
-    boton_predecir = gr.Button("🔮 Predecir Prioridad", variant="primary")
+    boton_predecir = gr.Button("Predecir prioridad", variant="primary")
     resultado_html = gr.HTML()
 
     boton_predecir.click(
         fn=_predecir,
-        inputs=[
-            asunto_ticket,
-            contenido_ticket,
-            canal_ticket,
-            categoria_problema,
-            usuario_tipo_cuenta,
-            usuario_antiguedad_dias,
-        ],
+        inputs=[asunto_ticket, contenido_ticket, canal_ticket, categoria_problema],
         outputs=resultado_html,
     )
 
 
 if __name__ == "__main__":
-    demo.launch(theme=tema, css=CSS)
+    demo.launch(theme=tema, css=CSS, server_name="0.0.0.0", server_port=7860)
