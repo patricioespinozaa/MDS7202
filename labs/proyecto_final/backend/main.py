@@ -31,8 +31,6 @@ def predict(request: PredictionRequest) -> PredictionResponse:
         nivel_prioridad = generate_prediction(
             asunto_ticket=request.asunto_ticket,
             contenido_ticket=request.contenido_ticket,
-            canal_ticket=request.canal_ticket,
-            categoria_problema=request.categoria_problema,
         )
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Error al generar la predicción: {exc}") from exc

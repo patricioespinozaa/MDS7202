@@ -16,9 +16,6 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-# Mismos valores categóricos vistos en tickets.parquet durante el entrenamiento.
-CanalTicket = Literal["Whatsapp", "Correo", "Página Web"]
-CategoriaProblema = Literal["Cuenta", "Fraude", "Técnica", "Cobros", "Pregunta general", "Otro"]
 NivelPrioridad = Literal["Baja", "Media", "Alta", "Critica"]
 
 
@@ -29,8 +26,6 @@ class PredictionRequest(BaseModel):
 
     asunto_ticket: str = Field(..., min_length=1, description="Asunto del ticket.")
     contenido_ticket: str = Field(..., min_length=1, description="Descripción/cuerpo del ticket.")
-    canal_ticket: CanalTicket = Field(..., description="Canal por el que llegó el ticket.")
-    categoria_problema: CategoriaProblema = Field(..., description="Categoría del problema reportado.")
 
 
 class PredictionResponse(BaseModel):
