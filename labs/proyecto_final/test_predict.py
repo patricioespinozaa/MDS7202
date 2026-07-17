@@ -10,8 +10,6 @@ payload = {
         "pero el destinatario dice que nunca le llegó. Necesito que revisen esto urgente "
         "porque es un monto importante."
     ),
-    "canal_ticket": "Whatsapp",
-    "categoria_problema": "Cuenta",
 }
 
 # print input
@@ -26,10 +24,8 @@ if response.status_code == 200:
 print("\nLLamada no exitosa:")
 
 payload_fail = {
-    "asunto_ticket": "Prueba",
+    "asunto_ticket": "",
     "contenido_ticket": "Contenido de prueba",
-    "canal_ticket": "Telegram",
-    "categoria_problema": "Cuenta",
 }
 print("Input:", payload_fail)
 response_fail = requests.post(f"{URL}/predict", json=payload_fail)

@@ -43,6 +43,8 @@ except KeyError as err:
 
 # Aunque en la parte 2 justificamos el por qué a nuestro juicio RL + Embeddings es mejor que MLP + Embeddings,
 # en el .pkl se utiliza el pipeline de MLP + Embeddings, ya que es el que se descaga al obtener un test ligeramente más alto.
+# ColumnTransformer solo selecciona las columnas embedding_dim_* (ver Parte 2), por lo que ninguna otra
+# feature tabular (N_Caracteres_Ticket, Canal_Ticket, Categoría_Problema, Texto) es necesaria en este script.
 try:
     with open(MODEL_PATH, "rb") as f:
         _pipeline = cloudpickle.load(f)
@@ -60,38 +62,15 @@ except Exception as e:
     raise RuntimeError("No se pudo inicializar el cliente de embeddings. ") from e
 
 
-def _contar_caracteres(asunto: str, contenido: str) -> int:
-    """
-    Cuenta la cantidad de caracteres del asunto y contenido de un ticket, normalizando
-    los saltos de línea a '\n' antes de contar. Esto asegura consistencia con
-    el cálculo de N_Caracteres_Ticket usado en el entrenamiento del modelo.
-
-    Args:
-        asunto: Asunto del ticket.
-        contenido: Contenido del ticket.
-    Returns:
-        La cantidad total de caracteres del asunto y contenido combinados.
-    """
-
-    def normalizar(texto: str) -> str:
-        return texto.replace("\r\n", "\n")
-
-    return len(normalizar(asunto)) + len(normalizar(contenido))
-
-
-def generate_prediction(
-    asunto_ticket: str,
-    contenido_ticket: str,
-    canal_ticket: str,
-    categoria_problema: str,
-) -> str:
+def generate_prediction(asunto_ticket: str, contenido_ticket: str) -> str:
     """Predice el Nivel_Prioridad de un ticket.
+
+    El pipeline final (MLP + Embeddings) solo consume los embeddings del texto,
+    por lo que estos dos campos son los únicos necesarios para generar la predicción.
 
     Args:
         asunto_ticket: Asunto del ticket.
         contenido_ticket: Descripción del ticket.
-        canal_ticket: Canal por el que llegó (p.ej. "Whatsapp", "Correo", "Página Web").
-        categoria_problema: Categoría del problema (p.ej. "Cuenta", "Fraude", "Técnica", ...).
 
     Returns:
         El Nivel_Prioridad predicho: "Baja", "Media", "Alta" o "Critica".
@@ -100,20 +79,7 @@ def generate_prediction(
     texto_embedding = f"Asunto_Ticket: {asunto_ticket}\nContenido_Ticket: {contenido_ticket}\n"
     vector = _embeddings_client.embed_query(texto_embedding)
 
-    # NOTE: Resto de features: Para nuesto modelo de MLP+Embeddings, solo necesitamos los embeddings
-    # El resto de variables se pasan pero son descartadas debido al ColumnTransformer que solo selecciona los embeddings para la predicción.
-    # Se pasan estas variables para mantener la consistencia con el pipeline entrenado y para escalabilidad con otros modelos de la Parte 2.
-    texto_bow = f"{asunto_ticket} {contenido_ticket}"
-    n_caracteres = _contar_caracteres(asunto_ticket, contenido_ticket)
-
-    fila = {
-        "N_Caracteres_Ticket": n_caracteres,
-        "Canal_Ticket": canal_ticket,
-        "Categoría_Problema": categoria_problema,
-        "Texto": texto_bow,
-    }
-    for i, valor in enumerate(vector, start=1):
-        fila[f"embedding_dim_{i}"] = valor
+    fila = {f"embedding_dim_{i}": valor for i, valor in enumerate(vector, start=1)}
 
     X = pd.DataFrame([fila])
     prediccion = _pipeline.predict(X)[0]
@@ -128,7 +94,5 @@ if __name__ == "__main__":
             "pero el destinatario dice que nunca le llegó. Necesito que revisen esto urgente "
             "porque es un monto importante."
         ),
-        canal_ticket="Whatsapp",
-        categoria_problema="Cuenta",
     )
     print("Predicción de Nivel_Prioridad:", resultado)

@@ -7,12 +7,7 @@ load_dotenv()
 BACKEND_URL = os.environ["BACKEND_URL"]
 
 
-def enviar_prediccion(
-    asunto_ticket: str,
-    contenido_ticket: str,
-    canal_ticket: str,
-    categoria_problema: str,
-) -> str:
+def enviar_prediccion(asunto_ticket: str, contenido_ticket: str) -> str:
     """Llama al endpoint /predict del backend y retorna el Nivel_Prioridad predicho.
 
     Si la llamada falla (error de red o respuesta con error), retorna un mensaje
@@ -21,16 +16,12 @@ def enviar_prediccion(
     Args:
         asunto_ticket: Asunto del ticket.
         contenido_ticket: Contenido del ticket.
-        canal_ticket: Canal de ingreso del ticket.
-        categoria_problema: Categoría del problema del ticket.
     Returns:
         El Nivel_Prioridad predicho: "Baja", "Media", "Alta", "Critica" o un mensaje de error legible.
     """
     payload = {
         "asunto_ticket": asunto_ticket,
         "contenido_ticket": contenido_ticket,
-        "canal_ticket": canal_ticket,
-        "categoria_problema": categoria_problema,
     }
 
     try:
