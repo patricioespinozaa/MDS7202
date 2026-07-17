@@ -1,0 +1,10 @@
+[project]
+name = "chaucherapp-frontend"
+version = "0.1.0"
+description = "Frontend para priorización de tickets de soporte de ChaucherApp"
+requires-python = ">=3.12"
+dependencies = [
+    "gradio>=6.20.0",
+    "python-dotenv>=1.2.2",
+    "requests>=2.32.5",
+]
