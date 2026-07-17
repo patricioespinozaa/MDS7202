@@ -9,10 +9,10 @@ payload = {
         "Hola, intenté hacer una transferencia a otro banco y me descontaron la plata "
         "pero el destinatario dice que nunca le llegó. Necesito que revisen esto urgente "
         "porque es un monto importante."
-        ),
-        "canal_ticket":"Whatsapp",
-        "categoria_problema":"Cuenta",
-    }
+    ),
+    "canal_ticket": "Whatsapp",
+    "categoria_problema": "Cuenta",
+}
 
 # print input
 print("Input:", payload)
@@ -28,7 +28,7 @@ print("\nLLamada no exitosa:")
 payload_fail = {
     "asunto_ticket": "Prueba",
     "contenido_ticket": "Contenido de prueba",
-    "canal_ticket": "Telegram",  
+    "canal_ticket": "Telegram",
     "categoria_problema": "Cuenta",
 }
 print("Input:", payload_fail)
