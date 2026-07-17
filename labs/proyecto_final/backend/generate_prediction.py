@@ -2,7 +2,7 @@
 Construya una función que dados los mínimos campos necesarios construya el input del pipeline entrenado anteriormente y luego utilice el pipeline para obtener la categoría.
 - Guarde el pipeline completo en un archivo .pickle
 - Cree la función ``generate_prediction`` que tome la menor cantidad de parámetros necesarios requeridos y retorne la predicción. Esta función deberá:
-  - Vectorizar el texto de forma idéntica a como se construyeron los embeddings que le fueron dados. Para esto: 
+  - Vectorizar el texto de forma idéntica a como se construyeron los embeddings que le fueron dados. Para esto:
     - Concatene el asunto y descripción de esta forma: `Asunto_Ticket: {asunto}\nContenido_Ticket: {contenido}\n`
     - Utilice la clase `GoogleGenerativeAIEmbeddings` de langchain con el modelo `gemini-embedding-001` y la opción `output_dimensionality=1024` para vectorizar el texto de forma análoga a lo que le fue entregado.
   - Procesar el resto de features hasta obtener las mismas variables que usó para la construcción del modelo
@@ -34,24 +34,20 @@ MODEL_PATH = Path(__file__).resolve().parent / "modelo_final.pkl"
 
 try:
     os.environ["GOOGLE_API_KEY"]
-except KeyError:
-    raise KeyError(
-        "La variable de entorno GOOGLE_API_KEY no está definida. "
-    )
+except KeyError as err:
+    raise KeyError("La variable de entorno GOOGLE_API_KEY no está definida. ") from err
 
 # Carga del pipeline entrenado desde el archivo .pickle
-# Utilizamos el formato .pkl en vez de .pickle ya que al buscar en internet salen como equivalentes y por otra parte el .pkl 
-# es el formato que venia definido en la Parte 2 
+# Utilizamos el formato .pkl en vez de .pickle ya que al buscar en internet salen como equivalentes y por otra parte el .pkl
+# es el formato que venia definido en la Parte 2
 
-# Aunque en la parte 2 justificamos el por qué a nuestro juicio RL + Embeddings es mejor que MLP + Embeddings, 
+# Aunque en la parte 2 justificamos el por qué a nuestro juicio RL + Embeddings es mejor que MLP + Embeddings,
 # en el .pkl se utiliza el pipeline de MLP + Embeddings, ya que es el que se descaga al obtener un test ligeramente más alto.
 try:
     with open(MODEL_PATH, "rb") as f:
         _pipeline = cloudpickle.load(f)
-except FileNotFoundError:
-    raise FileNotFoundError(
-        f"No se encontró el archivo {MODEL_PATH}. "
-    )
+except FileNotFoundError as err:
+    raise FileNotFoundError(f"No se encontró el archivo {MODEL_PATH}. ") from err
 
 
 try:
@@ -61,9 +57,7 @@ try:
         google_api_key=os.environ["GOOGLE_API_KEY"],
     )
 except Exception as e:
-    raise RuntimeError(
-        "No se pudo inicializar el cliente de embeddings. "
-    ) from e
+    raise RuntimeError("No se pudo inicializar el cliente de embeddings. ") from e
 
 
 def _contar_caracteres(asunto: str, contenido: str) -> int:
@@ -78,7 +72,10 @@ def _contar_caracteres(asunto: str, contenido: str) -> int:
     Returns:
         La cantidad total de caracteres del asunto y contenido combinados.
     """
-    normalizar = lambda texto: texto.replace("\r\n", "\n")
+
+    def normalizar(texto: str) -> str:
+        return texto.replace("\r\n", "\n")
+
     return len(normalizar(asunto)) + len(normalizar(contenido))
 
 

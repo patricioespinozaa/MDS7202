@@ -3,32 +3,29 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    image: chaucherapp-backend:latest
+    image: chaucherapp-backend:latest # mantener unicamente la ultima version de la imagen
     container_name: chaucherapp-backend
     env_file:
       - .env
     volumes:
       - ./backend:/app
-      # Volumen anónimo para /app/.venv: evita que el bind mount de arriba
+      # Volumen anónimo para /app/.venv, evitando que el bind mount de arriba
       # sobreescriba el entorno virtual ya instalado durante el build de la imagen.
       - /app/.venv
     ports:
       - "8000:8000"
-    networks:
+    networks: # conexion a la red interna
       - chaucherapp-net
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    image: chaucherapp-frontend:latest
+    image: chaucherapp-frontend:latest # mantener unicamente la ultima version de la imagen
     container_name: chaucherapp-frontend
     env_file:
       - .env
     environment:
-      # Dentro de la red de docker-compose, el backend se resuelve por su
-      # nombre de servicio, no por localhost/127.0.0.1. Sobrescribe el valor
-      # de desarrollo local que trae el .env compartido.
       - BACKEND_URL=http://backend:8000
     volumes:
       - ./frontend:/app
@@ -37,9 +34,10 @@ services:
       - "7860:7860"
     depends_on:
       - backend
-    networks:
+    networks:  # conexion a la red interna
       - chaucherapp-net
 
+# definicion de la red virtual interna
 networks:
   chaucherapp-net:
     driver: bridge
